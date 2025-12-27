@@ -1,252 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>答案之书 - 随机解惑</title>
-  <meta name="description" content="打开即可随机显示‘答案之书’的一条答案" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>答案书6 — 目录</title>
   <style>
-    /* 全局重置与字体 */
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%}
-    body{
-      font-family: "PingFang SC","Microsoft YaHei",sans-serif;
-      background: linear-gradient(135deg,#f0f8fb 0%,#e8f4f8 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      color:#2d3748;
-    }
-
-    /* 卡片 */
-    .card{
-      width:100%;
-      max-width:640px;
-      background:#fff;
-      border-radius:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.08);
-      padding:36px;
-      text-align:center;
-    }
-
-    /* 答案文本 */
-    #answer {
-      font-size:28px;
-      line-height:1.6;
-      min-height:120px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin-bottom:22px;
-      padding:10px 18px;
-      transition: opacity .32s ease, transform .32s ease;
-      border-radius:10px;
-      background: linear-gradient(180deg, rgba(66,153,225,0.03), rgba(56,178,172,0.02));
-    }
-    .fade-out{opacity:0; transform: translateY(6px) scale(.995)}
-    .fade-in{opacity:1; transform: translateY(0) scale(1)}
-
-    /* 控件 */
-    .controls{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-    button{
-      cursor:pointer;
-      border:0;
-      padding:10px 22px;
-      border-radius:999px;
-      font-size:16px;
-      color:#fff;
-      background:linear-gradient(90deg,#4299e1,#38b2ac);
-      box-shadow:0 6px 18px rgba(66,153,225,0.18);
-    }
-    button:active{transform: translateY(1px)}
-    .small{padding:8px 14px;font-size:14px;border-radius:10px;background: #edf2f7;color:#2d3748}
-    input[type="text"]{
-      padding:10px 12px;
-      border-radius:8px;
-      border:1px solid #e2e8f0;
-      width:320px;
-      max-width:100%;
-      font-size:15px;
-    }
-    #url-result{margin-top:10px;font-size:15px}
-
-    /* 小屏适配 */
-    @media (max-width:420px){
-      #answer{font-size:20px;min-height:96px}
-      input[type="text"]{width:100%}
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; max-width:900px; margin:40px auto; line-height:1.6; color:#222; padding:0 16px; }
+    header { text-align:center; margin-bottom:24px; }
+    h1 { margin:0 0 8px; font-size:28px; }
+    p.lead { color:#555; margin-top:0; }
+    ul { padding-left:1.1em; }
+    li { margin:10px 0; }
+    a { color:#0366d6; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .meta { color:#666; font-size:0.9em; }
+    footer { margin-top:36px; color:#666; font-size:0.9em; text-align:center; }
+    .search { margin-bottom:14px; }
+    input[type="search"] { width:100%; padding:8px 10px; font-size:14px; box-sizing:border-box; }
   </style>
 </head>
 <body>
-  <div class="card" role="main">
-    <div id="answer" class="fade-in" aria-live="polite"></div>
+  <header>
+    <h1>答案书6</h1>
+    <p class="lead">这是答案书6 的目录页。点击下面的条目打开对应答案页面。</p>
+    <p class="meta">如果启用 GitHub Pages，请把此文件作为站点首页（index.html）。</p>
+  </header>
 
-    <div class="controls" style="margin-bottom:18px">
-      <button id="refresh">再问一次</button>
+  <section>
+    <div class="search">
+      <input id="q" type="search" placeholder="搜索条目（示例：答案1）" oninput="filterList()">
     </div>
 
-    <div style="margin-top:6px;display:flex;flex-direction:column;align-items:center">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
-        <input id="url-input" type="text" placeholder="可选：输入网址检测（例如 https://example.com）" aria-label="网址输入" />
-        <button id="check-url" class="small">检测网址</button>
-      </div>
-      <div id="url-result" role="status"></div>
-    </div>
-  </div>
+    <ul id="list">
+      <li data-title="答案1"><a href="./answer1.html" target="_self">答案1</a> — 基础练习/题解（answer1.html）</li>
+      <!-- 添加新条目示例：
+      <li data-title="答案2"><a href="./answer2.html">答案2</a></li>
+      -->
+    </ul>
+  </section>
+
+  <footer>
+    <div>要添加更多条目：在仓库根目录新增 answer2.html、answer3.html 等，然后编辑此 index.html 或 README.md 添加链接。</div>
+  </footer>
 
   <script>
-    // 完整答案库（来自你提供的“答案之书”）
-    const answerLibrary = [
-      "别太赶了","别想了","不然呢？","要求不要太高","这是必然的，不要抗拒","不要做得过火了",
-      "大胆一点","大方一点","毫无疑问","好运将会降临","肯定的","没错","还有别的选择",
-      "你将取得成功","需要冒险","要主动","你在开玩笑吗？","你做什么都没用","千万不能失败",
-      "想得美","休息一下就好了","眼光长远一点","要变通","一笑了之","以后再说","用尽一切办法去努力",
-      "有","有可能","仔细想想再说","障碍重重","这不可取","值得奋斗","重新想想","注意细节",
-      "结果会让你惊喜","不作死就不会死","当局者迷","时间会证明一切","不要抱期望","换个角度想想",
-      "会很顺利","继续前进","你必须解决一些相关的问题","不会失望的","奇迹即将降临","尚待时日",
-      "省点力气吧","听听专家的意见","为什么不呢？","现在还说不清","现在你可以","学会妥协","要有点耐心",
-      "要知足","一定会有好结果的","改变心情","一直走下去","不适合","愉快生活","终点","换一个方向",
-      "岁月静好","放轻松这很简单","早点儿开始","不要后悔","沉默","好像平凡了点","糊涂一点更好",
-      "善待自己","呼吸一下新鲜空气","感恩，运气会越来越好","原谅","自我欣赏","复杂的事情简单做",
-      "学会自己保护自己","奇迹","给自己一个肯定","摆正心态","种下满足，收获幸福","学会好奇",
-      "最美丽的一天","永恒","不要刻意隐藏","不要刻意压抑","驻足静立","采用一个冒险的态度",
-      "允许你先休息一下","避免第一个解决方案","寻求援助会让你成功","需要耐心","实际一点吧",
-      "木已成舟","这可能很难，家是永远的避风港","学会改变什么","不要去忘记","最划算的交易",
-      "自信起来吧","学会成长","接受那些消失的","最好的事情正要发生","到此为止","没有什么是对的",
-      "时间有限","必须努力奔跑起来","慢下来","会有人陪着你","挥手道别","站起来去战斗",
-      "事情会朝目标发展","不要看轻别人","未来可期","多读一本书","平平安安","出发","挥别错的",
-      "差不多得了","有一些重要的事必须去做","用平淡的心态去追求","有人浪费了你的时间","一切皆有可能",
-      "事情没有看起来那么糟","不要回头","勇敢去做","你需要更多的爱","这会是一个惊喜","保持微笑",
-      "相信直觉","放下过去","拥抱变化","享受过程","别犹豫","专注当下","耐心等待","果断行动",
-      "别纠结","顺其自然","这是正确的选择","别放弃","再试一次","你是对的","保持冷静",
-      "别太较真","简单点","慢慢来","别担心","你能做到","这很值得","别勉强","听从内心",
-      "珍惜拥有","学会放下","向前看","别着急","保持希望","这只是开始","会好起来的",
-      "别太在意","换种方式","你很棒","坚持住","别偷懒","用心去做","别害怕","大胆尝试",
-      "这是暂时的","别自责","保持初心","别冲动","理性看待","灵活应对","乐观一点","积极面对",
-      "别拖延","主动出击","这需要时间","保持专注","别抱怨","学会感恩","这是必然的","别计较",
-      "学会宽容","这很正常","调整节奏","给自己空间","别盲从","独立思考","这很简单",
-      "别高估自己","别低估自己","保持热情","别冷漠","学会沟通","这会有回报","耐心点",
-      "别浮躁","脚踏实地","仰望星空","活在当下","别后悔","这是成长","接受现实","期待未来",
-      "别迷茫","找到方向","这是机遇","别错过","抓住机会","这是挑战","勇敢面对","别逃避",
-      "直面问题","这会过去的","别难过","开心点","这很有趣","保持好奇","别麻木","热爱生活",
-      "这是缘分","别强求","顺其自然","这是命运","别抗拒","坦然面对",
-
-      "建议先吃顿好的，吃饱了才有力气纠结","答案在奶茶里，喝到第三杯就会显现",
-      "这件事得看运气——主要看你今天有没有捡到钱","别想了，你家猫已经替你做了决定",
-      "结果不重要，重要的是你纠结的样子很可爱","不如去打游戏，赢一把就当答案是肯定的",
-      "老天爷说：这事我也管不了，你自己看着办","答案是“下次一定”，但这次先躺平",
-      "为什么数学书最忧伤？因为它有太多问题——跟你一样","你钱包的厚度，决定了这件事的难度",
-      "建议抛硬币，正面去做，反面再抛一次","其实答案是“多喝热水”，但我怕你打我",
-      "企鹅的肚子是白色的——因为它不想让你看清它的纠结","这件事就像减肥，说起来容易做起来难",
-      "蜗牛都比你果断，它至少知道要慢慢爬","别问答案，问就是“干饭要紧”",
-      "你的好运正在配送中，预计迟到365天","如果这件事太难，可能是老天在考验你的奶茶预算",
-      "答案藏在你的表情包里，翻到第8个就懂了","不如睡一觉，梦里会有更靠谱的答案",
-      "你纠结的样子，像极了想减肥又想吃宵夜的我","这件事的成功率，跟你早起的概率成正比",
-      "建议去逛超市，货架会告诉你该选哪样","老天爷打了个哈欠：这事我忘了安排",
-      "答案是“可以，但没必要”——主打一个随性","你家WiFi信号都比你果断，说断就断",
-      "别纠结了，隔壁小孩都知道该选奶茶","这件事就像穿袜子，左脚对了右脚可能错",
-      "如果感到迷茫，就去洗个澡——水会告诉你答案（其实是让你冷静）",
-      "你的宠物已经看穿一切，但它懒得告诉你","成功概率≈你不熬夜的天数，自己算",
-      "建议听首歌，歌词里藏着答案——前提是你能听懂","这件事得等月亮圆了，主要是图个仪式感",
-      "答案是“yes or no”，具体是哪个？看你今天的心情","别想了，再想头发就要离家出走了",
-      "你纠结的时间，足够刷完一集剧，不如先追剧","老天爷偷偷告诉我：这事有点悬，但你可爱就行",
-      "建议问你的输入法，打出来的第一个词就是答案","这件事就像拆盲盒，不管怎样都有惊喜（或惊吓）",
-      "没钱解决不了的问题，有钱没解决不了的——包括这件事",
-      "其实你内心早就有答案，只是想找个人夸你做得对",
-
-      "这事真不行，别硬撑了","听我的，赶紧放弃这个念头","此路不通，换条道走",
-      "不建议你这么做，容易踩坑","算了吧，大概率会后悔","方向错了，再努力也白费",
-      "达咩！这个选择真的不太行","别折腾了，结局大概率不理想","强烈不推荐，懂的都懂",
-      "行不通的，趁早收手","省省力气吧，这事成不了","劝你三思，真的没必要",
-      "这个想法pass，换个靠谱的","别往火坑里跳，快撤","大概率会翻车，慎重",
-      "听一句劝，这事真的别碰","不太行哦，换个思路吧","别执着了，这不是正确的选择",
-      "此方案驳回，重新规划","别犟了，行不通就是行不通"
-    ];
-
-    // DOM 元素
-    const answerEl = document.getElementById('answer');
-    const refreshBtn = document.getElementById('refresh');
-    const urlInput = document.getElementById('url-input');
-    const checkUrlBtn = document.getElementById('check-url');
-    const urlResult = document.getElementById('url-result');
-
-    // 随机获取
-    function randomAnswer() {
-      const i = Math.floor(Math.random() * answerLibrary.length);
-      return answerLibrary[i];
+    function filterList() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const items = document.querySelectorAll('#list li');
+      items.forEach(li => {
+        const title = (li.getAttribute('data-title') || li.textContent).toLowerCase();
+        li.style.display = title.indexOf(q) === -1 ? 'none' : '';
+      });
     }
-
-    // 渲染并带简单过渡
-    function showAnswer(text) {
-      answerEl.classList.remove('fade-in');
-      answerEl.classList.add('fade-out');
-      // 等动画短暂消失再显示新内容
-      setTimeout(() => {
-        answerEl.textContent = text;
-        answerEl.classList.remove('fade-out');
-        answerEl.classList.add('fade-in');
-      }, 140);
-    }
-
-    // 初次加载显示随机答案
-    window.addEventListener('load', () => {
-      showAnswer(randomAnswer());
-    });
-
-    // 再问一次按钮
-    refreshBtn.addEventListener('click', () => {
-      showAnswer(randomAnswer());
-    });
-
-    // 支持回车触发再问一次（当焦点不在URL输入框时）
-    window.addEventListener('keydown', (e) => {
-      if ((e.key === 'Enter' || e.key === ' ') && document.activeElement !== urlInput) {
-        e.preventDefault();
-        showAnswer(randomAnswer());
-      }
-    });
-
-    // 简单 URL 校验函数
-    function isValidURL(possible) {
-      try {
-        const u = new URL(possible);
-        return u.protocol === 'http:' || u.protocol === 'https:';
-      } catch (err) {
-        return false;
-      }
-    }
-
-    // 检测网址按钮
-    checkUrlBtn.addEventListener('click', () => {
-      const v = urlInput.value.trim();
-      if (!v) {
-        urlResult.textContent = '请输入网址后再检测';
-        urlResult.style.color = '#666';
-        return;
-      }
-      if (isValidURL(v)) {
-        urlResult.textContent = '这是一个有效的网址';
-        urlResult.style.color = 'green';
-      } else {
-        urlResult.textContent = '无法识别为有效的网址';
-        urlResult.style.color = 'red';
-      }
-    });
-
-    // （可选）如果希望页面通过 query 参数固定某个答案：?index=10
-    (function applyQueryIndex(){
-      try {
-        const params = new URLSearchParams(location.search);
-        const idx = params.get('index');
-        if (idx !== null) {
-          const n = parseInt(idx, 10);
-          if (!Number.isNaN(n) && n >= 0 && n < answerLibrary.length) {
-            showAnswer(answerLibrary[n]);
-          }
-        }
-      } catch(e){/* ignore */}
-    })();
   </script>
 </body>
 </html>
+
