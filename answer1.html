@@ -3,55 +3,141 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>答案书6 — 目录</title>
+  <title>答案书6 — 随机答案</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; max-width:900px; margin:40px auto; line-height:1.6; color:#222; padding:0 16px; }
-    header { text-align:center; margin-bottom:24px; }
-    h1 { margin:0 0 8px; font-size:28px; }
-    p.lead { color:#555; margin-top:0; }
-    ul { padding-left:1.1em; }
-    li { margin:10px 0; }
-    a { color:#0366d6; text-decoration:none; }
-    a:hover { text-decoration:underline; }
-    .meta { color:#666; font-size:0.9em; }
-    footer { margin-top:36px; color:#666; font-size:0.9em; text-align:center; }
-    .search { margin-bottom:14px; }
-    input[type="search"] { width:100%; padding:8px 10px; font-size:14px; box-sizing:border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; max-width:980px; margin:28px auto; padding:0 16px; color:#222; }
+    header { text-align:center; margin-bottom:18px; }
+    h1 { margin:0 0 6px; font-size:26px; }
+    .meta { color:#666; font-size:0.95em; margin-bottom:12px; }
+    #controls { display:flex; gap:8px; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
+    button, a.button { background:#0366d6; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; text-decoration:none; display:inline-block; }
+    button.secondary { background:#6a737d; }
+    #viewer { width:100%; height:70vh; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; }
+    ul { padding-left:1.1em; max-width:640px; margin:12px auto; }
+    li { margin:6px 0; }
+    .hint { color:#666; font-size:0.9em; text-align:center; margin-top:10px; }
   </style>
 </head>
 <body>
   <header>
-    <h1>答案书6</h1>
-    <p class="lead">这是答案书6 的目录页。点击下面的条目打开对应答案页面。</p>
-    <p class="meta">如果启用 GitHub Pages，请把此文件作为站点首页（index.html）。</p>
+    <h1>答案书6 — 随机查看</h1>
+    <p class="meta">打开页面会随机选择一个已列出的答案并在下方显示。你可以在本文件的条目里添加更多 answerN.html 文件的链接来扩充题库。</p>
   </header>
 
-  <section>
-    <div class="search">
-      <input id="q" type="search" placeholder="搜索条目（示例：答案1）" oninput="filterList()">
-    </div>
+  <div id="controls">
+    <button id="openRandom">随机显示（在本页）</button>
+    <button id="openRedirect" class="secondary">随机跳转（新页面/当前页面）</button>
+    <button id="another" class="secondary">换一个</button>
+    <a id="openNewTab" class="button secondary" href="#" target="_blank" rel="noopener">在新标签打开当前</a>
+  </div>
 
-    <ul id="list">
-      <li data-title="答案1"><a href="./answer1.html" target="_self">答案1</a> — 基础练习/题解（answer1.html）</li>
-      <!-- 添加新条目示例：
-      <li data-title="答案2"><a href="./answer2.html">答案2</a></li>
-      -->
-    </ul>
-  </section>
+  <div style="text-align:center; margin-bottom:8px;">
+    <input id="autoRedirect" type="checkbox" /> <label for="autoRedirect">加载时自动随机跳转（若选中，下次打开页面会直接跳转）</label>
+  </div>
 
-  <footer>
-    <div>要添加更多条目：在仓库根目录新增 answer2.html、answer3.html 等，然后编辑此 index.html 或 README.md 添加链接。</div>
+  <iframe id="viewer" title="答案预览"></iframe>
+
+  <div class="hint">已列出的答案（在此列表中添加新条目以让它们参与随机）：</div>
+  <ul id="list">
+    <li data-title="答案1"><a href="./answer1.html">答案1</a> — answer1.html</li>
+    <!-- 新条目示例：
+    <li data-title="答案2"><a href="./answer2.html">答案2</a></li>
+    -->
+  </ul>
+
+  <footer class="hint">
+    要添加更多答案，请在仓库根目录新增 answer2.html、answer3.html 等，然后在上面的 <code>&lt;ul id="list"&gt;</code> 中加入相应的 <code>&lt;li&gt;</code> 链接。
   </footer>
 
   <script>
-    function filterList() {
-      const q = document.getElementById('q').value.trim().toLowerCase();
-      const items = document.querySelectorAll('#list li');
-      items.forEach(li => {
-        const title = (li.getAttribute('data-title') || li.textContent).toLowerCase();
-        li.style.display = title.indexOf(q) === -1 ? 'none' : '';
+    (function(){
+      const listEl = document.getElementById('list');
+      const viewer = document.getElementById('viewer');
+      const openRandomBtn = document.getElementById('openRandom');
+      const openRedirectBtn = document.getElementById('openRedirect');
+      const anotherBtn = document.getElementById('another');
+      const openNewTab = document.getElementById('openNewTab');
+      const autoRedirectCheckbox = document.getElementById('autoRedirect');
+
+      // 从 ul#list 中获取所有链接（便于添加新条目而无需改脚本）
+      function getItems() {
+        const links = Array.from(listEl.querySelectorAll('a[href]'))
+          .map(a => ({ href: a.getAttribute('href'), title: a.textContent.trim() || (a.getAttribute('data-title')||'') }));
+        // 如果列表为空，回退到默认的 answer1.html（最多兼容现有仓库）
+        if (links.length === 0) return [{ href: './answer1.html', title:'答案1' }];
+        return links;
+      }
+
+      function pickRandom() {
+        const items = getItems();
+        return items[Math.floor(Math.random()*items.length)];
+      }
+
+      function setViewer(href) {
+        viewer.src = href;
+        openNewTab.href = href;
+      }
+
+      function doRedirect(href) {
+        // 跳转到选中的答案页面（当前页）
+        window.location.href = href;
+      }
+
+      function onOpenRandom() {
+        const item = pickRandom();
+        setViewer(item.href);
+      }
+
+      function onOpenRedirect() {
+        const item = pickRandom();
+        doRedirect(item.href);
+      }
+
+      function onAnother() {
+        // 选一个不同于当前的项（若可能）
+        const items = getItems();
+        if (items.length <= 1) return;
+        const current = viewer.src ? viewer.src.split('/').pop() : '';
+        let tries = 0, item;
+        do {
+          item = items[Math.floor(Math.random()*items.length)];
+          tries++;
+        } while (item.href === current && tries < 8);
+        setViewer(item.href);
+      }
+
+      // 事件绑定
+      openRandomBtn.addEventListener('click', onOpenRandom);
+      openRedirectBtn.addEventListener('click', onOpenRedirect);
+      anotherBtn.addEventListener('click', onAnother);
+
+      // 页面加载时根据参数或设置自动行为
+      window.addEventListener('load', () => {
+        // 支持 URL 参数 ?redirect=1 直接跳转
+        const params = new URLSearchParams(window.location.search);
+        const redirectParam = params.get('redirect');
+        const autoRedirect = autoRedirectCheckbox.checked;
+
+        // 如果 URL 有 ?redirect=1 或用户在上次选择了自动跳转（保存在 localStorage），则跳转
+        const autoPref = localStorage.getItem('answer_book_auto_redirect') === '1';
+        autoRedirectCheckbox.checked = autoPref;
+
+        if (redirectParam === '1' || autoPref) {
+          const item = pickRandom();
+          doRedirect(item.href);
+          return;
+        }
+
+        // 默认在页面内显示一个随机答案
+        const item = pickRandom();
+        setViewer(item.href);
       });
-    }
+
+      // 记住自动跳转偏好
+      autoRedirectCheckbox.addEventListener('change', () => {
+        localStorage.setItem('answer_book_auto_redirect', autoRedirectCheckbox.checked ? '1' : '0');
+      });
+    })();
   </script>
 </body>
 </html>
